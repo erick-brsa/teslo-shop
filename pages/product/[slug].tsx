@@ -1,66 +1,119 @@
-import { Box, Button, Chip, Grid, Typography } from '@mui/material';
-import { ShopLayout } from '../../components/layouts';
-import { ProductSlideshow, SizeSelector } from '../../components/products';
-import { ItemCounter } from '../../components/ui';
-import { IProduct } from '../../interfaces';
-import { NextPage, GetServerSideProps } from 'next';
-import { getProductBySlug, getAllProductSlugs } from '../../database/dbProducts';
-// import { useRouter } from 'next/router';
-// import { useProducts } from '../../hooks';
+import {useState, useEffect} from 'react';
+import { NextPage, GetStaticPaths, GetStaticProps } from "next"
+import { Box, Button, Chip, Grid, Typography } from "@mui/material"
+
+import { ShopLayout } from "../../components/layouts"
+import { ProductSlideshow, SizeSelector } from "../../components/products"
+import { ItemCounter } from "../../components/ui"
+
+import { getProductBySlug, getAllProductSlugs } from "../../database/"
+import { IProduct, ICartProduct, ISize } from "../../interfaces"
 
 interface Props {
-  product: IProduct;
+	product: IProduct
 }
 
-const ProductPage:NextPage<Props> = ({product}) => {
+const ProductPage: NextPage<Props> = ({ product }) => {
 
-  // const router = useRouter();
-  // const {products: product, isLoading } = useProducts(`/api/products/${router.query.slug}`);
-  // if (isLoading) return <h1>Loading...</h1>;
+	const [tempCartProduct, setTempCartProduct] = useState<ICartProduct>({
+		_id: product._id,
+		images: product.images[0],
+		price: product.price,
+		size: 'XS',
+		slug: product.slug,
+		title: product.title,
+		gender: product.gender,
+		quantity: 2,
+	})
+	
+	const handleOnSelectedSize = ( size: ISize ) => {
+		setTempCartProduct(currentProduct => ({
+			...currentProduct, size
+		}))
+	}
+	
+	const onUpdateQuantity = (quantity: number) => {
+		setTempCartProduct(currentProduct => ({
+			...currentProduct, quantity
+		}))
+	}
 
-  return (
-    <ShopLayout title={product.title} pageDescription={product.description}>
-      <Grid container spacing={3}>
-        <Grid item xs={12} sm={7}>
-          {/* Slideshow */}
-          <ProductSlideshow 
-            images={product.images}
-          />
-        </Grid>
+	const handleOnAddProduct = () => {
+		console.log({ tempCartProduct })
+	}
 
-        <Grid item xs={12} sm={5}>
+	return (
+		<ShopLayout title={product.title} pageDescription={product.description}>
+			<Grid container spacing={3}>
+				<Grid item xs={12} sm={7}>
+					{/* Slideshow */}
+					<ProductSlideshow images={product.images} />
+				</Grid>
 
-          <Box display="flex" flexDirection="column" alignItems="center">
-            {/* Títulos */}
-            <Typography variant="h1" component="h1">{product.title}</Typography>
-            <Typography variant="subtitle1" component="h2">{`$${product.price}`}</Typography>
+				<Grid item xs={12} sm={5}>
+					<Box
+						display="flex"
+						flexDirection="column"
+						alignItems="center"
+					>
+						{/* Títulos */}
+						<Typography variant="h1" component="h1">
+							{product.title}
+						</Typography>
+						<Typography
+							variant="subtitle1"
+							component="h2"
+						>{`$${product.price}`}</Typography>
 
-            {/* Cantidad */}
-              <Box sx={{my:2}}>
-                <Typography variant="subtitle2">Cantidad</Typography>
-                <ItemCounter />
-                <SizeSelector 
-                  selectedSize={product.sizes[2]}
-                  sizes={product.sizes}
-                />
-              </Box>
+						{/* Cantidad */}
+						<Box sx={{ my: 2 }}>
+							<Typography variant="subtitle2">
+								Cantidad
+							</Typography>
+							<ItemCounter 
+								currentValue={tempCartProduct.quantity}
+								updateQuantity={onUpdateQuantity}
+								maxValue={product.inStock > 5 ? 5 : product.inStock}
+							/>
+							<SizeSelector
+								sizes={product.sizes}
+								selectedSize={tempCartProduct.size}
+								onSelectSize={handleOnSelectedSize}
+							/>
+						</Box>
 
-            {/* Agregar ak carrito */}
-            <Button color="secondary" className="circular-btn">
-              Agregar al carrito
-            </Button>
+						{product.inStock > 0 ? (
+							<Button 
+								color="secondary" 
+								className="circular-btn"
+								// onClick={handleOnAddProduct}
+							>
+								Agregar al carrito
+								{tempCartProduct.size
+								? 'Agregar al carrito'
+								: 'Seleccione una talla'}
+							</Button>
+						) : (
+							<Chip
+								label="No hay disponible"
+								color="error"
+								variant="outlined"
+							/>
+						)}
 
-            {/* <Chip label="No hay disponible" color="error" variant="outlined" /> */}
-
-            <Box sx={{mt: 3}}>
-              <Typography variant="subtitle2">Descripción</Typography>
-              <Typography variant="body2">{product.description}</Typography>
-            </Box>
-          </Box>
-        </Grid>
-      </Grid>
-    </ShopLayout>
-  )
+						<Box sx={{ mt: 3 }}>
+							<Typography variant="subtitle2">
+								Descripción
+							</Typography>
+							<Typography variant="body2">
+								{product.description}
+							</Typography>
+						</Box>
+					</Box>
+				</Grid>
+			</Grid>
+		</ShopLayout>
+	)
 }
 
 // !getServerSideProps
@@ -81,44 +134,38 @@ const ProductPage:NextPage<Props> = ({product}) => {
 // }
 
 // !getStaticPaths
-// You should use getStaticPaths if you’re statically pre-rendering pages that use dynamic routes
-import { GetStaticPaths } from 'next'
 
 export const getStaticPaths: GetStaticPaths = async (ctx) => {
-  const productsSlugs = await getAllProductSlugs();
+	const productsSlugs = await getAllProductSlugs()
 
-  return {
-    paths: productsSlugs.map(({slug}) => ({
-      params: {
-        slug,
-      }
-    })), 
-    fallback: "blocking"
-  }
+	return {
+		paths: productsSlugs.map(({ slug }) => ({
+			params: { slug }
+		})),
+		fallback: "blocking"
+	}
 }
 
 // !getStaticProps
-import { GetStaticProps } from 'next'
 
-export const getStaticProps: GetStaticProps = async ({params}) => {
+export const getStaticProps: GetStaticProps = async ({ params }) => {
+	const { slug = "" } = params as { slug: string }
+	const product = await getProductBySlug(slug)
 
-  const {slug = ''} = params as {slug: string};
-  const product = await getProductBySlug(slug);
+	if (!product)
+		return {
+			redirect: {
+				destination: "/",
+				permanent: false
+			}
+		}
 
-  if (!product) return {
-      redirect: {
-          destination: '/',
-          permanent: false,
-      }
-  }
-
-  return {
-    props: {
-      product
-    },
-    revalidate: 60 * 60 * 24 // 1 day
-  }
+	return {
+		props: {
+			product
+		},
+		revalidate: 60 * 60 * 24 // 1 day
+	}
 }
-
 
 export default ProductPage

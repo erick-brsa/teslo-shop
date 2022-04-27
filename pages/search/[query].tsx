@@ -34,7 +34,7 @@ const HomePage: NextPage<Props> = ({products, foundProducts, query}) => {
 	)
 }
 
-export const getServerSideProps: GetServerSideProps = async ({params}) => {
+export const getServerSideProps: GetServerSideProps = async ({ params }) => {
     const { query = '' } = params as { query: string }
     if (query.length === 0) {
         return {
@@ -45,12 +45,12 @@ export const getServerSideProps: GetServerSideProps = async ({params}) => {
         }
     }
     let products = await getProductsByTerm(query);
+    
+    // TODO: retornar otros productos
     const foundProducts = products.length > 0;
     if (!foundProducts) { 
         products = await getAllProducts();
     }
-    
-    // TODO: retornar otros productos
     
     return {
         props: {

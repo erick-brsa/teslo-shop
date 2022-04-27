@@ -1,9 +1,9 @@
-import "../styles/globals.css"
-import type { AppProps } from "next/app"
 import { CssBaseline, ThemeProvider } from "@mui/material"
-import { SWRConfig } from "swr"
+import type { AppProps } from "next/app"
 import { lightTheme } from "../themes"
-import { UiProvider } from "../context"
+import { CartProvider, UiProvider } from "../context"
+import { SWRConfig } from "swr"
+import "../styles/globals.css"
 
 function MyApp({ Component, pageProps }: AppProps) {
 	return (
@@ -15,10 +15,12 @@ function MyApp({ Component, pageProps }: AppProps) {
 			}}
 		>
 			<UiProvider>
-				<ThemeProvider theme={lightTheme}>
-					<CssBaseline />
-					<Component {...pageProps} />
-				</ThemeProvider>
+				<CartProvider>
+					<ThemeProvider theme={lightTheme}>
+						<CssBaseline />
+						<Component {...pageProps} />
+					</ThemeProvider>
+				</CartProvider>
 			</UiProvider>
 		</SWRConfig>
 	)
