@@ -19,7 +19,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 }
 
 const getProducts = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
-
     const { gender = 'all' } = req.query;
     let condition = {};
     if (gender !== 'all' && SHOP_CONSTANT.validGenders.includes(`${gender}`)) {

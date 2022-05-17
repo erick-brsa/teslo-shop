@@ -6,11 +6,11 @@ import {
 	Box,
 	Typography,
 	Link
-} from "@mui/material"
-import { FC, useMemo, useState } from "react"
-import { IProduct } from "../../interfaces/products"
-import NextLink from "next/link"
-import { Chip } from "@mui/material"
+} from "@mui/material";
+import { FC, useMemo, useState } from "react";
+import { IProduct } from "../../interfaces/products";
+import NextLink from "next/link";
+import { Chip } from "@mui/material";
 
 interface Props {
 	product: IProduct
