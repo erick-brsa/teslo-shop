@@ -44,7 +44,12 @@ export const cartReducer = (state: CartState, action: CartActionType): CartState
                 ...state,
                 cart: state.cart.filter(product => !(product._id === action.payload._id && product.size === action.payload.size))
             }
-
+        case '[Cart] - Update order summary': {
+            return {
+                ...state,
+                ...action.payload
+            }
+        }
         default:
             return state;
     }
