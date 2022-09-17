@@ -1,9 +1,9 @@
-import { CssBaseline, ThemeProvider } from "@mui/material"
-import type { AppProps } from "next/app"
-import { lightTheme } from "../themes"
-import { CartProvider, UiProvider } from "../context"
-import { SWRConfig } from "swr"
-import "../styles/globals.css"
+import { CssBaseline, ThemeProvider } from '@mui/material';
+import type { AppProps } from 'next/app';
+import { lightTheme } from '../themes';
+import { CartProvider, UiProvider, AuthProvider } from '../context';
+import { SWRConfig } from 'swr';
+import '../styles/globals.css';
 
 function MyApp({ Component, pageProps }: AppProps) {
 	return (
@@ -14,16 +14,18 @@ function MyApp({ Component, pageProps }: AppProps) {
 					fetch(resource, init).then((res) => res.json())
 			}}
 		>
-			<UiProvider>
+			<AuthProvider>
 				<CartProvider>
-					<ThemeProvider theme={lightTheme}>
-						<CssBaseline />
-						<Component {...pageProps} />
-					</ThemeProvider>
+					<UiProvider>
+						<ThemeProvider theme={lightTheme}>
+							<CssBaseline />
+							<Component {...pageProps} />
+						</ThemeProvider>
+					</UiProvider>
 				</CartProvider>
-			</UiProvider>
+			</AuthProvider>
 		</SWRConfig>
-	)
+	);
 }
 
-export default MyApp
+export default MyApp;

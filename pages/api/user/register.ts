@@ -26,20 +26,20 @@ export default function handler(req: NextApiRequest, res: NextApiResponse<Data>)
 
 const registerUser = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
 	const { email = '', password = '', name = '' } = req.body as { email: string, password: string, name: string };
+    
+        if (name.length < 2) {
+            return res.status(400).json({
+                message: 'La nombre debe tener al menos 2 caracteres'
+            });
+        }
 
     if (password.length < 6) {
         return res.status(400).json({
             message: 'La contraseña debe tener al menos 6 caracteres'
         });
     }
-
-    if (name.length < 2) {
-        return res.status(400).json({
-            message: 'La nombre debe tener al menos 2 caracteres'
-        });
-    }
     
-    if (!alidations.isValidEmail(email)) {
+    if (!validations.isValidEmail(email)) {
         return res.status(400).json({
             message: 'El correo no es válido'
         });
@@ -47,7 +47,6 @@ const registerUser = async (req: NextApiRequest, res: NextApiResponse<Data>) => 
 
     await db.connect();
 	const user = await User.findOne({ email });
-    
 
     if (user) {
         return res.status(400).json({
