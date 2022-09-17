@@ -1,14 +1,16 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { db, SHOP_CONSTANT } from '../../database';
-import { IProduct } from '../../interfaces';
-import { Product } from '../../models';
+import { db, SHOP_CONSTANT } from '../../../database';
+import { IProduct } from '../../../interfaces';
+import { Product } from '../../../models';
 
-type Data = { message: string } | IProduct[]
+type Data = 
+| { message: string } 
+| IProduct[]
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
-    if (process.env.NODE_ENV === 'production') {
-        return res.status(401).json({ message: 'No estás autorizado' });
-    }
+    // if (process.env.NODE_ENV === 'production') {
+    //     return res.status(401).json({ message: 'No estás autorizado' });
+    // }
 
     switch (req.method) {
         case 'GET':
