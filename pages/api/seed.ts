@@ -20,5 +20,5 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     
     await db.disconnect();
 
-    res.status(200).json({ message: 'Respuesta' })
+    res.status(200).json({ message: 'Proceso realizado correctamente' })
 }

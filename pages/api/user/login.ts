@@ -25,6 +25,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse<Data>)
 }
 
 const loginUser = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
+    
 	const { email = '', password = '' } = req.body;
 
 	await db.connect();

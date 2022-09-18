@@ -2,7 +2,15 @@ import { useState, useContext } from 'react';
 import NextLink from 'next/link';
 import { useForm } from 'react-hook-form';
 
-import { Box, Button, Chip, Grid, Link, TextField, Typography } from '@mui/material';
+import {
+	Box,
+	Button,
+	Chip,
+	Grid,
+	Link,
+	TextField,
+	Typography
+} from '@mui/material';
 import { ErrorOutline } from '@mui/icons-material';
 
 import { AuthLayout } from '../../components/layouts';
@@ -16,8 +24,8 @@ interface FormData {
 	password: string;
 }
 
-const LoginPage = () => {
-
+const LoginPage = () => { 
+	
 	const { register, handleSubmit, formState: { errors } } = useForm<FormData>();
 
 	const router = useRouter();
@@ -26,7 +34,7 @@ const LoginPage = () => {
 	const { loginUser } = useContext(AuthContext);
 
 	const onLoginUser = async ({ email, password }: FormData) => {
-		
+
 		setShowError(false);
 
 		const isValidLogin = await loginUser(email, password);
@@ -34,12 +42,11 @@ const LoginPage = () => {
 		if (!isValidLogin) {
 			setShowError(true);
 			setTimeout(() => setShowError(false), 3000);
-			return
+			return;
 		}
 
-		// TODO: Navegar a la patalla en la que se encontraba el usuario
-		router.replace('/')
-
+		const destination = router.query.p?.toString() || '/';
+		router.replace(destination);
 	};
 
 	return (
@@ -52,10 +59,10 @@ const LoginPage = () => {
 								Iniciar sesión
 							</Typography>
 							{showError && (
-								<Chip 
+								<Chip
 									label="No reconocemos ese usuario y/o contraseña"
 									color="error"
-									icon={ <ErrorOutline /> }
+									icon={<ErrorOutline />}
 									className="fadeId"
 								/>
 							)}
@@ -66,12 +73,12 @@ const LoginPage = () => {
 								label="Correo"
 								variant="filled"
 								fullWidth
-								{ ...register('email', {
-										required: 'Este campo es requerido',
-										validate: validations.isEmail
+								{...register('email', {
+									required: 'Este campo es requerido',
+									validate: validations.isEmail
 								})}
-								error={ !!errors.email }
-								helperText={ errors.email?.message }
+								error={!!errors.email}
+								helperText={errors.email?.message}
 							/>
 						</Grid>
 						<Grid item xs={12}>
@@ -80,14 +87,15 @@ const LoginPage = () => {
 								type="password"
 								variant="filled"
 								fullWidth
-								{ ...register('password', {
+								{...register('password', {
 									required: 'Este campo es requerido',
 									minLength: {
-										value: 6, message: 'ínimo 6 caracteres'
+										value: 6,
+										message: 'ínimo 6 caracteres'
 									}
 								})}
-								error={ !!errors.password }
-								helperText={ errors.password?.message }
+								error={!!errors.password}
+								helperText={errors.password?.message}
 							/>
 						</Grid>
 						<Grid item xs={12}>
@@ -102,7 +110,14 @@ const LoginPage = () => {
 							</Button>
 						</Grid>
 						<Grid item xs={12} display="flex" justifyContent="end">
-							<NextLink href="/auth/register" passHref>
+							<NextLink
+								href={
+									router.query.p
+										? `/auth/register?p=${router.query.p}`
+										: `/auth/register`
+								}
+								passHref
+							>
 								<Link>¿No tienes una cuenta? Regístrate</Link>
 							</NextLink>
 						</Grid>
