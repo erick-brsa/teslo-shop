@@ -30,9 +30,21 @@ export default NextAuth({
 		})
 	],
 
-	// jwt: {
-	// 	secret: process.env.JWT_SECRET_SEED
-	// }
+	// Custom pages
+	pages: {
+		signIn: '/auth/login',
+		newUser: '/auth/register'
+	},
+
+	jwt: {
+		// secret: process.env.JWT_SECRET_SEED
+	},
+
+	session: {
+		maxAge: 2592999, // 30d
+		strategy: 'jwt',
+		updateAge: 86400
+	},
 
 	// Callbacks
 	callbacks: {
@@ -44,8 +56,7 @@ export default NextAuth({
 						token.user = user;
 						break;
 					case 'oauth':
-						// TODO: Crear usuario o verificar si existe en la BD
-						// token.user = account;
+						token.user = await dbUsers.oAuthToDbUser(user?.email || '', user?.name || '');
 						break;
 				}
 			}
