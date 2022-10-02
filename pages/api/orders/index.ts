@@ -37,8 +37,6 @@ const createOrder = async (req: NextApiRequest, res: NextApiResponse) => {
     await db.connect();
     const dbProducts = await Product.find({ _id: { $in: productsIds } })    
 
-    console.log(req.body)
-
     try {    
         const subTotal = orderItems.reduce((prev, current) => {
             // const currentPrice = dbProducts.find(prod => prod._id === current._id)?.price
