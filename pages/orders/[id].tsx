@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { getSession } from 'next-auth/react';
 import { GetServerSideProps, NextPage } from 'next';
 import { PayPalButtons } from '@paypal/react-paypal-js';
-import { useRouter } from 'next/router';
 import NextLink from 'next/link';
 
 import {
@@ -25,6 +24,7 @@ import { ShopLayout } from '../../components/layouts';
 import { IOrder } from '../../interfaces';
 import { dbOrders } from '../../database';
 import { tesloApi } from '../../config';
+import { useRouter } from 'next/router';
 
 export type OrderResponseBody = {
 	id: string;
@@ -40,9 +40,9 @@ interface Props {
 }
 
 const OrderPage: NextPage<Props> = ({ order }) => {
-	const router = useRouter();
 	const { isPaid, shippingAddress, numberOfItems, orderItems } = order;
 	const [isPaying, setIsPaying] = useState(false);
+	const router = useRouter();
 
 	const onOrderCompleted = async (details: OrderResponseBody) => {
 		if (details.status !== 'COMPLETED') {
@@ -71,7 +71,7 @@ const OrderPage: NextPage<Props> = ({ order }) => {
 			pageDescription={'Resumen de orden'}
 		>
 			<Typography variant="h1" component="h1">
-				Orden: ASDHE
+				Orden: {order._id}
 			</Typography>
 
 			{isPaid ? (
@@ -186,12 +186,8 @@ const OrderPage: NextPage<Props> = ({ order }) => {
 											});
 										}}
 										onApprove={(data, actions) => {
-											return actions
-												.order!.capture()
-												.then(
-													(
-														details: OrderResponseBody
-													) => {
+											return actions.order!.capture().then((details: OrderResponseBody) => {
+													console.log(details)
 														onOrderCompleted(details);
 													}
 												);

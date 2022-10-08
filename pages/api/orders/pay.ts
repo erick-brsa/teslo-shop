@@ -1,8 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import axios from 'axios';
+
 import { IPaypal } from '../../../interfaces';
-import { db } from '../../../database';
 import { Order } from '../../../models';
+import { db } from '../../../database';
 
 type Data = {
 	message: string;
@@ -34,6 +35,7 @@ const getPaypalBearerToken = async (): Promise<string|null> => {
         })
 
         return data.access_token;
+
     } catch (error) {
         if (axios.isAxiosError(error)) {
             console.log(error.response?.data);
@@ -59,12 +61,12 @@ const payOrder = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
 
     const { data } = await axios.get<IPaypal.PaypalOrderStatusResponse>(`${process.env.PAYPAL_ORDERS_URL}/${transactionId}`, {
         headers: {
-            'Authorization': `Beader ${paypalBearerToken}`
+            'Authorization': `Bearer ${paypalBearerToken}`
         }
     })
 
     if (data.status !== 'COMPLETED') {
-        return res.status(401).json({ message: 'Order no reconocida' })
+        return res.status(401).json({ message: 'Orden no reconocida' })
     }
     
     await db.connect();
